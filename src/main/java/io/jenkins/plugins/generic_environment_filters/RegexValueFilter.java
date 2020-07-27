@@ -46,12 +46,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
  * Example of Jenkins global configuration.
  */
 public class RegexValueFilter implements EnvVarsFilterGlobalRule {
+
+    private static final Logger LOGGER = Logger.getLogger(RegexValueFilter.class.getName());
 
     private String regex;
 
@@ -68,26 +72,28 @@ public class RegexValueFilter implements EnvVarsFilterGlobalRule {
         this.filterAction = filterAction;
     }
 
-    public boolean isApplicable(@CheckForNull Run<?, ?> run, @Nonnull Object o, @Nonnull Launcher launcher) {
-        if (run == null) {
-            return true;
-        }
-
+    public boolean isApplicable(@CheckForNull final Run<?, ?> run, @Nonnull Object o, @Nonnull Launcher launcher) {
         if (descriptorMatcher != null) {
             if (o instanceof Describable) {
-                return descriptorMatcher.test(((Describable) o).getDescriptor());
-            } else {
-                return false;
-            }
-        }
-
-        if (exclusions != null) {
-            for (RunMatcher matcher : exclusions) {
-                if (matcher.test(run)) {
+                if (!descriptorMatcher.test(((Describable) o).getDescriptor())) {
+                    LOGGER.log(Level.CONFIG, o.toString() + " is not one of the globally configured applicable descriptors");
                     return false;
                 }
             }
         }
+
+        if (run == null) {
+            LOGGER.log(Level.CONFIG, "Run is null for " + launcher + " and: " + o + " so always including it");
+            return true;
+        }
+
+        if (exclusions != null) {
+            if (exclusions.stream().anyMatch(it -> it.test(run))) {
+                LOGGER.log(Level.CONFIG, run.toString() + " is being excluded");
+                return false;
+            }
+        }
+        LOGGER.log(Level.CONFIG, "No exclusions apply");
         return true;
     }
 
