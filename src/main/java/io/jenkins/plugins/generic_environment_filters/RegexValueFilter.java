@@ -26,10 +26,12 @@ package io.jenkins.plugins.generic_environment_filters;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.util.FormValidation;
 import io.jenkins.plugins.environment_filter_utils.matchers.descriptor.DescriptorMatcher;
 import io.jenkins.plugins.environment_filter_utils.matchers.run.RunMatcher;
 import jenkins.tasks.filters.EnvVarsFilterException;
@@ -38,6 +40,7 @@ import jenkins.tasks.filters.EnvVarsFilterRuleContext;
 import org.jvnet.localizer.Localizable;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -49,6 +52,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Example of Jenkins global configuration.
@@ -146,6 +150,18 @@ public class RegexValueFilter implements EnvVarsFilterGlobalRule {
         @Override
         public @Nonnull String getDisplayName() {
             return Messages.RegexValueFilter_DisplayName();
+        }
+
+        public FormValidation doCheckRegex(@QueryParameter final String value) {
+            if (value == null) {
+                return FormValidation.ok();
+            }
+            try {
+                Pattern.compile(value);
+            } catch (PatternSyntaxException pse) {
+                return FormValidation.errorWithMarkup("<pre>" + Util.xmlEscape(pse.getMessage()) + "</pre>");
+            }
+            return FormValidation.ok(Messages.RegexValueFilter_RegexValid());
         }
     }
 
