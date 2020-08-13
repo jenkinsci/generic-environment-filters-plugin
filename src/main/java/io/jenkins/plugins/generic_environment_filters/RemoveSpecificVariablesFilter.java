@@ -40,7 +40,7 @@ public class RemoveSpecificVariablesFilter implements EnvVarsFilterGlobalRule {
     private String key;
 
     @DataBoundConstructor
-    public RemoveSpecificVariablesFilter(String key, String value) {
+    public RemoveSpecificVariablesFilter(String key) {
         this.key = key;
     }
 
