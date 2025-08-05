@@ -29,11 +29,10 @@ import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.Descriptor;
 import hudson.model.Run;
+import javax.annotation.Nonnull;
 import jenkins.tasks.filters.EnvVarsFilterGlobalRule;
 import jenkins.tasks.filters.EnvVarsFilterRuleContext;
 import org.kohsuke.stapler.DataBoundConstructor;
-
-import javax.annotation.Nonnull;
 
 public class VariableContributingFilter implements EnvVarsFilterGlobalRule {
 
@@ -61,15 +60,17 @@ public class VariableContributingFilter implements EnvVarsFilterGlobalRule {
 
     @Override
     public void filter(@NonNull EnvVars envVars, @NonNull EnvVarsFilterRuleContext envVarsFilterRuleContext) {
-        envVarsFilterRuleContext.getTaskListener().getLogger().println(Messages.VariableContributingFilter_LogMessage(getKey()));
+        envVarsFilterRuleContext
+                .getTaskListener()
+                .getLogger()
+                .println(Messages.VariableContributingFilter_LogMessage(getKey()));
         envVars.put(getKey(), getValue());
     }
 
     @Extension
     public static class DescriptorImpl extends Descriptor<EnvVarsFilterGlobalRule> {
         @Override
-        public @Nonnull
-        String getDisplayName() {
+        public @Nonnull String getDisplayName() {
             return Messages.VariableContributingFilter_DisplayName();
         }
     }

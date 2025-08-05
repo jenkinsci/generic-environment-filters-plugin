@@ -29,11 +29,10 @@ import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.Descriptor;
 import hudson.model.Run;
+import javax.annotation.Nonnull;
 import jenkins.tasks.filters.EnvVarsFilterGlobalRule;
 import jenkins.tasks.filters.EnvVarsFilterRuleContext;
 import org.kohsuke.stapler.DataBoundConstructor;
-
-import javax.annotation.Nonnull;
 
 public class RemoveSpecificVariablesFilter implements EnvVarsFilterGlobalRule {
 
@@ -56,7 +55,10 @@ public class RemoveSpecificVariablesFilter implements EnvVarsFilterGlobalRule {
     @Override
     public void filter(@NonNull EnvVars envVars, @NonNull EnvVarsFilterRuleContext envVarsFilterRuleContext) {
         if (envVars.containsKey(getKey())) {
-            envVarsFilterRuleContext.getTaskListener().getLogger().println(Messages.RemoveSpecificVariablesFilter_LogMessage(getKey()));
+            envVarsFilterRuleContext
+                    .getTaskListener()
+                    .getLogger()
+                    .println(Messages.RemoveSpecificVariablesFilter_LogMessage(getKey()));
             envVars.remove(getKey());
         }
     }
@@ -64,8 +66,7 @@ public class RemoveSpecificVariablesFilter implements EnvVarsFilterGlobalRule {
     @Extension
     public static class DescriptorImpl extends Descriptor<EnvVarsFilterGlobalRule> {
         @Override
-        public @Nonnull
-        String getDisplayName() {
+        public @Nonnull String getDisplayName() {
             return Messages.RemoveSpecificVariablesFilter_DisplayName();
         }
     }

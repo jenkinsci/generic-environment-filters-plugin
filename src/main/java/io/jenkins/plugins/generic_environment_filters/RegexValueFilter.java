@@ -34,16 +34,6 @@ import hudson.model.TaskListener;
 import hudson.util.FormValidation;
 import io.jenkins.plugins.environment_filter_utils.matchers.descriptor.DescriptorMatcher;
 import io.jenkins.plugins.environment_filter_utils.matchers.run.RunMatcher;
-import jenkins.tasks.filters.EnvVarsFilterException;
-import jenkins.tasks.filters.EnvVarsFilterGlobalRule;
-import jenkins.tasks.filters.EnvVarsFilterRuleContext;
-import org.jvnet.localizer.Localizable;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.QueryParameter;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +43,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import jenkins.tasks.filters.EnvVarsFilterException;
+import jenkins.tasks.filters.EnvVarsFilterGlobalRule;
+import jenkins.tasks.filters.EnvVarsFilterRuleContext;
+import org.jvnet.localizer.Localizable;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
 
 /**
  * Example of Jenkins global configuration.
@@ -80,7 +79,9 @@ public class RegexValueFilter implements EnvVarsFilterGlobalRule {
         if (descriptorMatcher != null) {
             if (o instanceof Describable) {
                 if (!descriptorMatcher.test(((Describable) o).getDescriptor())) {
-                    LOGGER.log(Level.CONFIG, o.toString() + " is not one of the globally configured applicable descriptors");
+                    LOGGER.log(
+                            Level.CONFIG,
+                            o.toString() + " is not one of the globally configured applicable descriptors");
                     return false;
                 }
             }
@@ -102,7 +103,8 @@ public class RegexValueFilter implements EnvVarsFilterGlobalRule {
     }
 
     @Override
-    public void filter(@Nonnull EnvVars envVars, @Nonnull EnvVarsFilterRuleContext envVarsFilterRuleContext) throws EnvVarsFilterException {
+    public void filter(@Nonnull EnvVars envVars, @Nonnull EnvVarsFilterRuleContext envVarsFilterRuleContext)
+            throws EnvVarsFilterException {
         if (regex == null) {
             return;
         }
@@ -196,10 +198,12 @@ public class RegexValueFilter implements EnvVarsFilterGlobalRule {
         listener.getLogger().println(Messages.RegexValueFilter_REMOVE_LogMessage(key));
         envVars.remove(key);
     }
+
     private static void redact(EnvVars envVars, String key, TaskListener listener) {
         listener.getLogger().println(Messages.RegexValueFilter_REDACT_LogMessage(key));
         envVars.put(key, "REDACTED");
     }
+
     private static void fail(EnvVars envVars, String key, TaskListener listener) throws EnvVarsFilterException {
         listener.getLogger().println(Messages.RegexValueFilter_FAIL_LogMessage(key));
         throw new EnvVarsFilterException("Environment variable '" + key + "' matched prohibited value");
